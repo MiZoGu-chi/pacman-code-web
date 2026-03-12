@@ -1,25 +1,33 @@
 package com.pacman.web;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-/**
- * Simple in-memory score manager.
- * Stores high scores without requiring a database.
- * Scores are lost when the server restarts.
- */
+
 public class ScoreManager {
     
     private static final Logger LOGGER = Logger.getLogger(ScoreManager.class.getName());
     private static ScoreManager instance;
     
-    private final List<Score> scores = new CopyOnWriteArrayList<>();
-    private int nextId = 1;
-    
-    private ScoreManager() {}
+    // Paramètres de connexion
+    private final String url = "jdbc:mysql://localhost:3306/pacman_db?useSSL=false&serverTimezone=UTC";
+    private final String user = "root";
+    private final String password = ""; // À remplir si tu as un mot de passe
+
+    private ScoreManager() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            LOGGER.severe("Driver MySQL non trouvé !");
+        }
+    }
     
     public static synchronized ScoreManager getInstance() {
         if (instance == null) {
@@ -27,55 +35,86 @@ public class ScoreManager {
         }
         return instance;
     }
-    
-    /**
-     * Saves a new score.
-     */
-    public synchronized void saveScore(Score score) {
-        score.setId(nextId++);
-        scores.add(score);
-        LOGGER.info("Score saved: " + score);
+
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
     }
     
     /**
-     * Gets the top scores, sorted by score descending.
+     * Saves a new score to the database.
+     */
+    public void saveScore(Score score) {
+        String sql = "INSERT INTO scores (pseudo, score) VALUES (?, ?)";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            
+            pstmt.setString(1, score.getPlayerName()); 
+            pstmt.setInt(2, score.getScore());
+            pstmt.executeUpdate();
+
+            // Récupérer l'ID auto-généré pour mettre à jour l'objet Score
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    score.setId(rs.getInt(1));
+                }
+            }
+            LOGGER.info("Score saved to database: " + score);
+            
+        } catch (SQLException e) {
+            LOGGER.severe("Error saving score: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Gets the top scores from database, sorted by score descending.
      */
     public List<Score> getTopScores(int limit) {
-        List<Score> sortedScores = new ArrayList<>(scores);
-        sortedScores.sort(Comparator.comparingInt(Score::getScore).reversed());
+        List<Score> topScores = new ArrayList<>();
+        String sql = "SELECT id, pseudo, score FROM scores ORDER BY score DESC LIMIT ?";
         
-        if (sortedScores.size() > limit) {
-            return sortedScores.subList(0, limit);
-        }
-        return sortedScores;
-    }
-    
-    /**
-     * Gets all scores for a specific game.
-     */
-    public List<Score> getScoresForGame(String gameId) {
-        List<Score> gameScores = new ArrayList<>();
-        for (Score score : scores) {
-            if (gameId.equals(score.getGameId())) {
-                gameScores.add(score);
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, limit);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Score s = new Score();
+                s.setId(rs.getInt("id"));
+                s.setPlayerName(rs.getString("pseudo"));
+                s.setScore(rs.getInt("score"));
+                topScores.add(s);
             }
+        } catch (SQLException e) {
+            LOGGER.severe("Error getting top scores: " + e.getMessage());
         }
-        gameScores.sort(Comparator.comparingInt(Score::getScore).reversed());
-        return gameScores;
+        return topScores;
     }
-    
+
     /**
-     * Clears all scores.
+     * Clears all scores 
      */
     public void clearScores() {
-        scores.clear();
-        LOGGER.info("All scores cleared");
+        String sql = "DELETE FROM scores";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            LOGGER.info("Database scores table cleared");
+        } catch (SQLException e) {
+            LOGGER.severe("Error clearing scores: " + e.getMessage());
+        }
     }
-    
-    /**
-     * Gets the total number of scores.
-     */
+
     public int getScoreCount() {
-        return scores.size();
+        String sql = "SELECT COUNT(*) FROM scores";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            LOGGER.severe("Error counting scores: " + e.getMessage());
+        }
+        return 0;
     }
 }
