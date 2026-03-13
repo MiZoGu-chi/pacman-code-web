@@ -1,6 +1,7 @@
 package com.pacman.web;
 
 import java.beans.PropertyChangeEvent;
+
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +12,17 @@ import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
-import model.AgentAction;
-import model.Maze;
-import model.PacmanGame;
-import model.PositionAgent;
-import model.agents.Ghost;
-import model.agents.Pacman;
-import model.strategies.KeyboardStrategy;
+
+import com.pacman.model.AgentAction;
+import com.pacman.model.Maze;
+import com.pacman.model.PacmanGame;
+import com.pacman.model.PositionAgent;
+import com.pacman.model.agents.Ghost;
+import com.pacman.model.agents.Pacman;
+import com.pacman.model.strategies.KeyboardStrategy;
 
 public class GameManager {
+	
     private static final Logger LOGGER = Logger.getLogger(GameManager.class.getName());
     private static GameManager instance;
     private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();

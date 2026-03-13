@@ -2,9 +2,9 @@ package com.pacman.model.strategies;
 
 import java.util.Random;
 
-import model.AgentAction;
-import model.Maze;
-import model.agents.Agent;
+import com.pacman.model.AgentAction;
+import com.pacman.model.Maze;
+import com.pacman.model.agents.Agent;
 
 public class RandomStrategy implements Strategy {
 

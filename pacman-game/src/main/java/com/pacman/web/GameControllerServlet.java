@@ -1,6 +1,7 @@
 package com.pacman.web;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,16 +16,26 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.pacman.dao.DAOFactory;
+import com.pacman.dao.ScoreDao;
+
 @WebServlet(urlPatterns = {"/game/*"})
 public class GameControllerServlet extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(GameControllerServlet.class.getName());
+	
+    private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(GameControllerServlet.class.getName());
     private String layoutsPath;
+    private ScoreManager scoreManager;
     
     @Override
     public void init() throws ServletException {
         super.init();
         layoutsPath = getServletContext().getRealPath("/layouts");
         LOGGER.info("GameControllerServlet initialized. Layouts path: " + layoutsPath);
+        
+        DAOFactory daoFactory = DAOFactory.getInstance();
+        ScoreDao scoreDao = daoFactory.getScoreDao();
+        scoreManager = new ScoreManager(scoreDao);
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -85,7 +96,7 @@ public class GameControllerServlet extends HttpServlet {
         
         request.setAttribute("activeGames", activeGames);
         request.setAttribute("layouts", getAvailableLayouts());
-        request.setAttribute("topScores", ScoreManager.getInstance().getTopScores(10));
+        request.setAttribute("topScores", scoreManager.getTopScores(10));
         
         request.getRequestDispatcher("/WEB-INF/views/lobby.jsp").forward(request, response);
     }
@@ -214,7 +225,7 @@ public class GameControllerServlet extends HttpServlet {
             try {
                 int score = Integer.parseInt(scoreStr);
                 Score scoreObj = new Score(playerName, score, gameId);
-                ScoreManager.getInstance().saveScore(scoreObj);
+                scoreManager.saveScore(scoreObj);
                 
                 response.setContentType("application/json");
                 response.getWriter().print("{\"success\":true}");
@@ -230,7 +241,7 @@ public class GameControllerServlet extends HttpServlet {
     private void showScores(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        request.setAttribute("topScores", ScoreManager.getInstance().getTopScores(20));
+        request.setAttribute("topScores", scoreManager.getTopScores(20));
         request.getRequestDispatcher("/WEB-INF/views/scores.jsp").forward(request, response);
     }
 
