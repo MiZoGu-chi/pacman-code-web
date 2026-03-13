@@ -1,7 +1,7 @@
-package controller;
+package com.pacman.controller;
 
 import java.util.logging.Logger;
-import model.Game;
+import com.pacman.model.Game;
 
 public abstract class AbstractController {
     
@@ -48,4 +48,5 @@ public abstract class AbstractController {
         return game;
     }
 }
+ 
  
