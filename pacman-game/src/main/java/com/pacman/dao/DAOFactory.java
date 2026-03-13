@@ -49,4 +49,8 @@ public class DAOFactory {
     public ScoreDao getScoreDao() {
         return new ScoreDaoImpl(this);
     }
+
+    public UserDao getUserDao() {
+        return new UserDaoImpl(this);
+    }
 }

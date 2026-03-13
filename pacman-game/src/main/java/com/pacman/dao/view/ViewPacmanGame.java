@@ -1,18 +1,22 @@
-package view;
+package com.pacman.dao.view;
 
-import controller.AbstractController;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyListener;
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame; 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+
+import controller.AbstractController;
 import model.PacmanGame;
 
 

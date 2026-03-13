@@ -1,8 +1,9 @@
-package view;
+package com.pacman.dao.view;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 

@@ -1,17 +1,15 @@
-package view.states;
+package com.pacman.dao.view.states;
 
 import view.ViewCommand;
 
-public class StateGameEnded extends State {
+public class StatePause extends State {
 
-    public StateGameEnded(ViewCommand v) {
+    public StatePause(ViewCommand v) {
         super(v);
     }
 
     @Override
-    public void pause() { 
-
-    }
+    public void pause() { }
 
     @Override
     public void restart() {
@@ -19,20 +17,20 @@ public class StateGameEnded extends State {
     }
 
     @Override
-    public void run() { 
-
+    public void run() {
+        viewCommand.setState(new StateRun(viewCommand));
     }
 
     @Override
-    public void step() { 
-
+    public void step() {
+        
     }
 
     @Override
     public void updateButtons() {
         viewCommand.getPauseButton().setEnabled(false);
         viewCommand.getRestartButton().setEnabled(true);
-        viewCommand.getRunButton().setEnabled(false);
-        viewCommand.getStepButton().setEnabled(false);
+        viewCommand.getRunButton().setEnabled(true);
+        viewCommand.getStepButton().setEnabled(true);
     }
 }

@@ -1,9 +1,11 @@
-package view;
+package com.pacman.dao.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+
 import javax.swing.JPanel;
+
 import model.Maze;
 import model.PositionAgent;
 

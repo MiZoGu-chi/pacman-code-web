@@ -1,4 +1,4 @@
-package view;
+package com.pacman.dao.view;
 
 import controller.AbstractController;
 import java.awt.*;

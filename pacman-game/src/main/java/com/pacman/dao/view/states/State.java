@@ -1,4 +1,4 @@
-package view.states;
+package com.pacman.dao.view.states;
 
 import view.ViewCommand;
 
