@@ -11,7 +11,7 @@ public class SoundObserver implements PropertyChangeListener {
         String event = evt.getPropertyName();
 
         switch (event) {
-            case "FoodEaten" -> SoundManager.getInstance().playSound("sounds/pacman_chomp.wav");
+            case "FoodEaten" -> SoundManager.getInstance().playSoundExclusive("sounds/pacman_chomp.wav");
             case "GameStart" -> SoundManager.getInstance().playSound("sounds/pacman_beginning.wav");
             case "PacmanDeath" -> SoundManager.getInstance().playSound("sounds/pacman_death.wav");
             case "GhostEaten" -> SoundManager.getInstance().playSound("sounds/pacman_eatghost.wav");

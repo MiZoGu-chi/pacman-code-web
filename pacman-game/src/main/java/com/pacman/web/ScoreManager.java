@@ -40,9 +40,6 @@ public class ScoreManager {
         return DriverManager.getConnection(url, user, password);
     }
     
-    /**
-     * Saves a new score to the database.
-     */
     public void saveScore(Score score) {
         String sql = "INSERT INTO scores (pseudo, score) VALUES (?, ?)";
         
@@ -59,16 +56,13 @@ public class ScoreManager {
                     score.setId(rs.getInt(1));
                 }
             }
-            LOGGER.info("Score saved to database: " + score);
+            LOGGER.info(() -> "Score saved to database: " + score);
             
         } catch (SQLException e) {
-            LOGGER.severe("Error saving score: " + e.getMessage());
+            LOGGER.severe(() -> "Error saving score: " + e.getMessage());
         }
     }
     
-    /**
-     * Gets the top scores from database, sorted by score descending.
-     */
     public List<Score> getTopScores(int limit) {
         List<Score> topScores = new ArrayList<>();
         String sql = "SELECT id, pseudo, score FROM scores ORDER BY score DESC LIMIT ?";
@@ -87,14 +81,11 @@ public class ScoreManager {
                 topScores.add(s);
             }
         } catch (SQLException e) {
-            LOGGER.severe("Error getting top scores: " + e.getMessage());
+            LOGGER.severe(() -> "Error getting top scores: " + e.getMessage());
         }
         return topScores;
     }
 
-    /**
-     * Clears all scores 
-     */
     public void clearScores() {
         String sql = "DELETE FROM scores";
         try (Connection conn = getConnection();
@@ -102,7 +93,7 @@ public class ScoreManager {
             stmt.executeUpdate(sql);
             LOGGER.info("Database scores table cleared");
         } catch (SQLException e) {
-            LOGGER.severe("Error clearing scores: " + e.getMessage());
+            LOGGER.severe(() -> "Error clearing scores: " + e.getMessage());
         }
     }
 
@@ -113,7 +104,7 @@ public class ScoreManager {
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
-            LOGGER.severe("Error counting scores: " + e.getMessage());
+            LOGGER.severe(() -> "Error counting scores: " + e.getMessage());
         }
         return 0;
     }
