@@ -1,0 +1,209 @@
+package com.pacman.view;
+
+import com.pacman.controller.AbstractController;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
+import java.beans.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame; 
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import com.pacman.model.PacmanGame;
+
+import java.awt.Desktop;
+
+
+public final class ViewPacmanGame extends JFrame implements PropertyChangeListener {
+
+
+    private static final long serialVersionUID = 1L;
+    
+	private final PacmanGame game;
+    private final PanelPacmanGame panelPacman;
+
+    private final JMenuBar menuBar;
+    private final JMenuItem layoutMenuItem;
+
+    private final PanelInfoPacman panelInfo;
+    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    
+    private final ViewLoginPacman viewLogin;
+
+    public ViewPacmanGame(PacmanGame game, AbstractController controller) {
+        this.game = game;
+        
+        viewLogin = new ViewLoginPacman();
+
+        setTitle("Pacman");
+        setSize(new Dimension(700, 700));
+
+        panelPacman = new PanelPacmanGame(game.getMaze());
+        panelInfo = new PanelInfoPacman();
+
+        panelInfo.updateScore(game.getScore());
+        panelInfo.updateLives(game.getLife());
+
+        Dimension windowSize = getSize(); 
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Point centerPoint = ge.getCenterPoint();
+        int dx = centerPoint.x - windowSize.width / 2;
+        int dy = centerPoint.y - windowSize.height / 2 - 350;
+        setLocation(dx, dy);
+        
+        // gestion du la registration de le loginPanel
+        viewLogin.addRegisterRedirectListener(e -> {
+            String url = "http://localhost:8080/pacman-game/register.jsp";
+            String os = System.getProperty("os.name").toLowerCase();
+            try {
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    Desktop.getDesktop().browse(new java.net.URI(url));
+                } else {
+                    if (os.contains("win")) {
+                        new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", url).start();
+                    } else if (os.contains("nix") || os.contains("nux")) {
+                        new ProcessBuilder("xdg-open", url).start();
+                    } else if (os.contains("mac")) {
+                        new ProcessBuilder("open", url).start();
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Impossible d'ouvrir le navigateur.\nURL : " + url);
+            }
+        });
+
+        // Menu
+        menuBar = new JMenuBar();
+        layoutMenuItem = new JMenuItem("Load a Layout");
+        menuBar.add(layoutMenuItem);
+        setJMenuBar(menuBar); 
+        
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+
+        layoutMenuItem.addActionListener((ActionEvent e) -> {
+            chargerLayout();
+        });
+
+        game.addPropertyChangeListener(this);
+
+        setLayout(new BorderLayout()); 
+        //add(panelInfo, BorderLayout.NORTH);
+        //add(panelPacman, BorderLayout.CENTER);
+
+        //panelPacman.setFocusable(true);
+        //panelPacman.requestFocusInWindow();
+        
+        add(viewLogin, BorderLayout.CENTER);
+        setVisible(true);
+    }    
+
+    public void chargerLayout() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Choose a layout file");
+        fileChooser.setCurrentDirectory(new java.io.File("layouts"));
+
+        int res = fileChooser.showOpenDialog(this); 
+        if (res == JFileChooser.APPROVE_OPTION) {
+            java.io.File selectedFile = fileChooser.getSelectedFile();
+            try {
+                String filename = selectedFile.getName();
+                String layoutPath = "layouts/" + filename;
+                System.out.println("filename: " + filename);
+                System.out.println("path :" + layoutPath);
+                
+                support.firePropertyChange("layoutChanged", null, layoutPath);
+
+                System.out.println("property change fired");
+                
+            } catch (Exception e) {
+                e.printStackTrace(); 
+                System.err.println("ERROR in chargerLayout: " + e.getMessage());
+            }
+        }
+    }
+    
+    // appeler après que l'utilisateur ce soit connecté ou ingoré la connexion
+    public void launchGame() {
+        getContentPane().removeAll(); 
+        
+        setTitle("Pacman");
+        add(panelInfo, BorderLayout.NORTH);
+        add(panelPacman, BorderLayout.CENTER);
+        
+        revalidate();
+        repaint();
+        
+        panelPacman.setFocusable(true);
+        panelPacman.requestFocusInWindow();
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+	    if("turn".equals(evt.getPropertyName())) {
+	        int currentTurn = (int) evt.getNewValue(); 
+	        
+	        if (currentTurn <= 0) {
+	            panelPacman.setGameOver(false);
+	            panelPacman.setVictory(false);
+	        }
+	        update();
+	    }
+        if("PacmanCreated".equals(evt.getPropertyName())) {
+            SwingUtilities.invokeLater(() -> {
+                panelPacman.setFocusable(true);
+                panelPacman.requestFocusInWindow();
+            });
+        }
+        if("layoutLoaded".equals(evt.getPropertyName())) {
+            panelPacman.setMaze(game.getMaze());
+            panelPacman.setPacmans_pos(game.getPacmansPosition()); 
+            panelPacman.setGhosts_pos(game.getGhostsPosition()); 
+            panelPacman.repaint();
+        }
+        if("PacmanInvicible".equals(evt.getPropertyName())) {
+            panelPacman.setGhostsScarred(true); 
+        }
+        if("PacmanNormal".equals(evt.getPropertyName())) {
+            panelPacman.setGhostsScarred(false); 
+        }
+        if("ScoreChanged".equals(evt.getPropertyName())) {
+            panelInfo.updateScore(game.getScore());
+        }
+        if("LifeChanged".equals(evt.getPropertyName())) {
+            panelInfo.updateLives(game.getLife());
+        }
+        if ("Victory".equals(evt.getPropertyName())) {
+            panelPacman.setVictory(true);
+        } 
+        if ("GameOver".equals(evt.getPropertyName())) {
+            panelPacman.setGameOver(true);
+        }
+        if("GameStart".equals(evt.getPropertyName())) {
+            panelPacman.setLaunch(true);
+        }
+        if("GameStartFinished".equals(evt.getPropertyName())) {
+            panelPacman.setLaunch(false);
+        }
+    }
+    
+    public void update() {
+        panelPacman.setGhosts_pos(game.getGhostsPosition());
+        panelPacman.setPacmans_pos(game.getPacmansPosition());   
+        panelPacman.repaint();     
+    }
+
+    public void setKeyListener(KeyListener keyListener) {
+        panelPacman.addKeyListener(keyListener);
+    }
+}
