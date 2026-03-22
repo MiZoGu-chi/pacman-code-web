@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <title>Login</title>
-    <link type="text/css" rel="stylesheet" href="form.css" />
+    <link type="text/css" rel="stylesheet" href="css/form.css" />
 </head>
 <body>
-	<img src="pacman.png" alt="Pacman Logo" class="logo-pacman" />
+	<img src="images/pacman.png" alt="Pacman Logo" class="logo-pacman" />
     <form method="post" action="login">
         <fieldset>
             <legend>Login</legend>
