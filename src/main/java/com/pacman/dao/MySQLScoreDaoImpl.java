@@ -11,11 +11,11 @@ import java.util.List;
 
 import com.pacman.web.entity.Score;
 
-public class ScoreDaoImpl implements ScoreDao {
+public class MySQLScoreDaoImpl implements ScoreDao {
 
     private final DAOFactory daoFactory;
 
-    ScoreDaoImpl(DAOFactory daoFactory) {
+    MySQLScoreDaoImpl(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 

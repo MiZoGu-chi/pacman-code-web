@@ -17,7 +17,8 @@ public class LoginServlet extends HttpServlet {
     private UserDao userDao;
 
     public void init() {
-        userDao = DAOFactory.getInstance().getUserDao();
+    	DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        userDao = daoFactory.getUserDao();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

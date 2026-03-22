@@ -19,8 +19,8 @@ public class ScoreServlet extends HttpServlet {
 
     @Override
     public void init() {
-        DAOFactory daoFactory = DAOFactory.getInstance();
-        this.scoreManager = new ScoreManager(daoFactory.getScoreDao());
+        DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        scoreManager = new ScoreManager(daoFactory.getScoreDao());
     }
 
     @Override

@@ -1,38 +1,102 @@
 @charset "UTF-8";
 
-/* Général ------------------------------------------------------------------------------------- */
+/* Style général pour centrer le contenu */
+body {
+    background-color: #f4f4f9; /* Un gris très clair pour le côté sobre */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
 
-body, p, legend, label, input {
-    font: normal 8pt verdana, helvetica, sans-serif;
+/* Conteneur du formulaire */
+form {
+    background: white;
+    padding: 20px 30px;
+    border: 3px solid #0047AB; /* Ton encadré bleu */
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 350px;
+}
+
+/* Image Pacman au-dessus */
+.logo-pacman {
+    display: block;
+    margin: 0 auto 20px auto;
+    width: 80px; /* À ajuster selon la taille de ton image */
+    height: auto;
 }
 
 fieldset {
-    padding: 10px;
-    border: 1px #0568CD solid;
+    border: none;
+    padding: 0;
+    margin: 0;
 }
 
 legend {
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #0568CD;
+    color: #0047AB;
+    margin-bottom: 15px;
+    text-align: center;
+    width: 100%;
 }
 
-/* Forms --------------------------------------------------------------------------------------- */
-
-form label {
-    float: left;
-    width: 200px;
-    margin: 3px 0px 0px 0px;
+/* Champs de saisie */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
 }
 
-form input {
-    margin: 3px 3px 0px 0px;
-    border: 1px #999 solid;
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Évite que l'input dépasse du cadre */
 }
 
-form input.sansLabel {
-    margin-left: 200px;
+/* Bouton de validation */
+.sansLabel {
+    background-color: #0047AB;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-form .requis {
-    color: #c00;
+.sansLabel:hover {
+    background-color: #002D62;
+}
+
+/* Liens en bas de formulaire */
+p {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 15px;
+}
+
+a {
+    color: #0047AB;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.requis {
+    color: red;
 }

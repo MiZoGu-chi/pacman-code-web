@@ -7,6 +7,7 @@
     <link type="text/css" rel="stylesheet" href="form.css" />
 </head>
 <body>
+	<img src="pacman.png" alt="Pacman Logo" class="logo-pacman" />
     <form method="post" action="login">
         <fieldset>
             <legend>Login</legend>

@@ -22,7 +22,7 @@ public class RegistrationServlet extends HttpServlet {
         user.setEmail(request.getParameter("email"));
         user.setPassword(request.getParameter("motdepasse"));
         
-        DAOFactory.getInstance().getUserDao().saveUser(user);
-        response.sendRedirect("login.jsp");
+        DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        daoFactory.getUserDao().saveUser(user);
     }
 }

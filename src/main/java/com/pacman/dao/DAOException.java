@@ -2,7 +2,9 @@ package com.pacman.dao;
 
 public class DAOException extends RuntimeException {
 
-    public DAOException(String message) {
+    private static final long serialVersionUID = 1L;
+
+	public DAOException(String message) {
         super(message);
     }
 

@@ -8,11 +8,11 @@ import java.sql.Statement;
 
 import com.pacman.web.entity.User;
 
-public class UserDaoImpl implements UserDao {
+public class MySQLUserDaoImpl implements UserDao {
 
     private final DAOFactory daoFactory;
 
-    public UserDaoImpl(DAOFactory daoFactory) {
+    public MySQLUserDaoImpl(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
 
