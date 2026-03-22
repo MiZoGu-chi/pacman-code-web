@@ -24,5 +24,7 @@ public class RegistrationServlet extends HttpServlet {
         
         DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
         daoFactory.getUserDao().saveUser(user);
+        
+        response.sendRedirect("login.jsp");
     }
 }
