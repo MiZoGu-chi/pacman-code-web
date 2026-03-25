@@ -2,7 +2,6 @@ package com.pacman.controller;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import com.pacman.model.AgentAction;
 import com.pacman.model.PacmanGame;
 import com.pacman.model.agents.Pacman;
@@ -10,40 +9,46 @@ import com.pacman.model.commands.ChangeDirectionCommand;
 import com.pacman.view.ViewCommand;
 import com.pacman.view.ViewPacmanGame;
 
-public class ControllerPacmanGame extends AbstractController implements PropertyChangeListener  {
+public class ControllerPacmanGame extends AbstractController implements PropertyChangeListener {
 
-    private final ViewPacmanGame viewPacman;
-    private final ViewCommand viewCommand;
-    private final InputHandler inputHandler;
+    private ViewPacmanGame viewPacman; // N'est plus final
+    private ViewCommand viewCommand;   // N'est plus final
+    private InputHandler inputHandler;
 
     public ControllerPacmanGame(PacmanGame game) {
         super(game);
-
-        viewPacman = new ViewPacmanGame(game, this);
-        viewCommand = new ViewCommand(game, this);
+        // On ne crée plus les vues ici !
         
         inputHandler = new InputHandler();
-        viewPacman.setKeyListener(inputHandler);
-        
- 
         game.addPropertyChangeListener(this); 
-        viewPacman.addPropertyChangeListener(this);
 
         SoundObserver soundObserver = new SoundObserver();
         game.addPropertyChangeListener(soundObserver);
     }
 
+    public void setViewPacman(ViewPacmanGame view) {
+        viewPacman = view;
+        viewPacman.setKeyListener(inputHandler);
+        viewPacman.addPropertyChangeListener(this);
+    }
+
+    public void setViewCommand(ViewCommand view) {
+        this.viewCommand = view;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if("layoutChanged".equals(evt.getPropertyName())) {
+        if ("layoutChanged".equals(evt.getPropertyName())) {
             String newLayout = (String) evt.getNewValue();
-            System.out.println("ControllerPacmaneGame : new Layout : " + newLayout);
             ((PacmanGame) getGame()).loadNewMaze(newLayout);
-            viewCommand.getState().restart();
-        }
-        if("PacmanCreated".equals(evt.getPropertyName())) {
-            Pacman p = (Pacman) evt.getNewValue();
             
+            if (viewCommand != null) {
+                viewCommand.getState().restart();
+            }
+        }
+        
+        if ("PacmanCreated".equals(evt.getPropertyName())) {
+            Pacman p = (Pacman) evt.getNewValue();
             if (p.isControlled()) { 
                 inputHandler.setArrowControls(
                     new ChangeDirectionCommand(p, AgentAction.NORTH),
@@ -53,9 +58,5 @@ public class ControllerPacmanGame extends AbstractController implements Property
                 );
             }
         }
-    }
-
-    public ViewPacmanGame getView() {
-        return this.viewPacman;
     }
 }

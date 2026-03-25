@@ -20,6 +20,7 @@ import com.pacman.model.strategies.EatNearestFoodStrategy;
 import com.pacman.model.strategies.EscapeStrategy;
 import com.pacman.model.strategies.KeyboardStrategy;
 import com.pacman.model.strategies.RandomStrategy;
+import com.pacman.network.GameState;
 
 public class PacmanGame extends Game {
 
@@ -294,6 +295,27 @@ public class PacmanGame extends Game {
             if(p.isAlive()) return false;
         }
         return true;
+    }
+    
+    /**
+     * synchronise le jeu locale avec les donneés reçues par le serveur
+     * pour le moment on recharge l'entièreté du jeu à chaque fois
+     */
+    public void updateFromState(GameState state) {
+    	
+    	pacmans.clear();
+    	ghosts.clear();
+    	
+    	for(PositionAgent p : state.getPacmanPositions()) {
+    		pacmans.add(new Pacman(p));
+    	}
+    	
+    	for(PositionAgent g : state.getGhostPositions()) {
+    		ghosts.add(new Ghost(g));
+    	}   
+    	
+        score = state.getScore();
+        life = state.getLives();
     }
     
     public boolean isVictory() {

@@ -31,8 +31,23 @@
             </tbody>
         </table>
         
+        <h3>Personnaliser mon Pacman</h3>
+        <p>Debug Rank : ${sessionScope.currentUser.getRank().toString()}</p>
+        <img src="images/ranks/${sessionScope.currentUser.rank.toString()}.svg" alt="Rank icon" width="80" />
+		<p>Niveau : ${sessionScope.currentUser.rank}</p>
+		<form action="updateColor" method="post">
+		    <label for="pacmanColor">Couleur de votre personnage :</label>
+		    <select name="pacmanColor" id="pacmanColor">
+		        <option value="yellow" ${sessionScope.currentUser.color == 'yellow' ? 'selected' : ''}>Jaune (Classique)</option>
+		        <option value="red" ${sessionScope.currentUser.color == 'red' ? 'selected' : ''}>Rouge</option>
+		        <option value="blue" ${sessionScope.currentUser.color == 'blue' ? 'selected' : ''}>Bleu</option>
+		        <option value="pink" ${sessionScope.currentUser.color == 'pink' ? 'selected' : ''}>Rose</option>
+		    </select>
+		    <input type="submit" value="Enregistrer mon choix" />
+		</form>
+        
         <br/>
-        <p><a href="login.jsp">Se déconnecter</a></p>
+        <p><a href="logout">Se déconnecter</a></p>
     </div>
 </body>
 </html>

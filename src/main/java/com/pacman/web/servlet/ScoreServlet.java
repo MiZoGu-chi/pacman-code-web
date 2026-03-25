@@ -46,4 +46,29 @@ public class ScoreServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(json.toString());
     }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String playerName = request.getParameter("playerName");
+        String scoreStr = request.getParameter("score");
+
+        if (playerName != null && scoreStr != null) {
+            try {
+                int scoreValue = Integer.parseInt(scoreStr);
+                
+                Score newScore = new Score();
+                newScore.setPlayerName(playerName);
+                newScore.setScore(scoreValue);
+                
+                scoreManager.saveScore(newScore); 
+
+                System.out.println("Score enregistré avec succès pour : " + playerName);
+                response.setStatus(HttpServletResponse.SC_OK); // 200 OK
+            } catch (NumberFormatException e) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Format de score invalide");
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Paramètres manquants");
+        }
+    }
 }

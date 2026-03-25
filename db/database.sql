@@ -9,6 +9,8 @@ CREATE TABLE
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         registration_date DATETIME DEFAULT CURRENT_TIMESTAMP
+        color VARCHAR(20) DEFAULT 'yellow',
+        victories INT DEFAULT 0
     );	
     	
 CREATE TABLE

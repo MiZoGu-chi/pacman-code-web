@@ -18,7 +18,7 @@ public class HomeServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         DAOFactory daoFactory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
-        // Récupération des scores via le DAO
+        
         List<Score> scores = daoFactory.getScoreDao().getTopScores(10); 
         
         request.setAttribute("scores", scores);

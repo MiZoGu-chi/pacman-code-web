@@ -206,4 +206,8 @@ public final class ViewPacmanGame extends JFrame implements PropertyChangeListen
     public void setKeyListener(KeyListener keyListener) {
         panelPacman.addKeyListener(keyListener);
     }
+    
+    public ViewLoginPacman getViewLogin() {
+        return viewLogin; 
+    }
 }

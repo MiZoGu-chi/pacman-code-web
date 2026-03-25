@@ -1,6 +1,6 @@
 package com.pacman.web.entity;
 
-import com.google.protobuf.Timestamp;
+import java.sql.Date;
 
 public class User {
 
@@ -8,7 +8,13 @@ public class User {
     private String email;
     private String password;
     private String username;
-    private Timestamp registrationDate;
+    private Date registrationDate;
+    
+    // couleur du pacman, à rempalcer par des skins
+    private String color = "yellow";
+    
+    // determine le rank du joueur
+    private int victories;
 
     public Long getId() {
         return id;
@@ -41,12 +47,38 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+    
+    public String getColor() {
+    	return color;
+    }
 
-    public Timestamp getRegistrationDate() {
+    public void setColor(String color) {
+    	this.color = color;
+    }
+    
+    public void incrVictories() {
+    	victories++;
+    }
+    
+    public int getVictories() {
+    	return victories;
+    }
+    
+    public void setVictories(int victories) {
+    	this.victories = victories;
+    }
+    
+    public Rank getRank() {
+		if (victories > 15) return Rank.GOLD;
+		if (victories >= 1) return Rank.SILVER; // volontrairement bas pour la démonstration
+		return Rank.BRONZE;
+    }
+    
+    public Date getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(Timestamp registrationDate) {
+    public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
     }
 }

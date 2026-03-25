@@ -42,7 +42,7 @@ public class MySQLUserDaoImpl implements UserDao {
     @Override
     public User findUser(String email) throws DAOException {
     	User user = null;
-        String sql = "SELECT id, email, password, username FROM users WHERE email = ?";
+        String sql = "SELECT id, email, password, username, color, victories FROM users WHERE email = ?";
 
         try (Connection conn = daoFactory.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -52,10 +52,13 @@ public class MySQLUserDaoImpl implements UserDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     user = new User();
+                    
                     user.setId(rs.getLong("id"));
                     user.setEmail(rs.getString("email"));
                     user.setPassword(rs.getString("password"));
                     user.setUsername(rs.getString("username"));
+                    user.setColor(rs.getString("color"));
+                    user.setVictories(rs.getInt("victories"));
                 }
             }
         } catch (SQLException e) {
@@ -63,4 +66,19 @@ public class MySQLUserDaoImpl implements UserDao {
         }
         return user;
     }
+
+	@Override
+	public void updateColor(long userId, String color) throws DAOException {
+		String sql = "UPDATE users SET color = ? Where id = ?";
+		
+        try (Connection conn = daoFactory.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {          
+               pstmt.setString(1, color);
+               pstmt.setLong(2, userId);
+               pstmt.executeUpdate();
+
+           } catch (SQLException e) {
+               throw new DAOException("Error updating color", e);
+           }
+	}
 }
