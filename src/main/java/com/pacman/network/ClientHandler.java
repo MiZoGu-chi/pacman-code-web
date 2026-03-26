@@ -24,17 +24,16 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             while (true) {
-                // On attend de recevoir un objet (ChangeDirection) du client
                 Object obj = in.readObject();
-                if (obj instanceof ChangeDirection) {
-                    ChangeDirection cd = (ChangeDirection) obj;
-                    // On applique le changement via ton ServerMain
+                if (obj instanceof ChangeDirection cd) {
                     ServerMain.applyDirectionChange(clientId, cd.getDirection());
                 }
             }
         } catch (Exception e) {
-            System.out.println("Client " + clientId + " déconnecté.");
+            System.out.println("Déconnexion du client " + clientId);
         } finally {
+            // TRÈS IMPORTANT : On prévient le serveur que la place est libre
+            ServerMain.removeClient(clientId);
             close();
         }
     }

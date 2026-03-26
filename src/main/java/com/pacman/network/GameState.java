@@ -10,6 +10,9 @@ public class GameState implements Serializable {
     
     private List<PositionAgent> pacmanPositions;
     private List<PositionAgent> ghostPositions;
+   
+    private boolean[][] foods;
+    private boolean[][] capsules;
     
     private int score; 
     private int lives;
@@ -34,4 +37,10 @@ public class GameState implements Serializable {
 
     public boolean isVictory() { return victory; }
     public void setVictory(boolean victory) { this.victory = victory; }
+    
+    public void setFoods(boolean[][] foods) { this.foods = foods; }
+    public boolean[][] getFoods() { return foods; }
+    
+    public void setCapsules(boolean[][] capsules) { this.capsules = capsules; }
+    public boolean[][] getCapsules() { return capsules; }
 }

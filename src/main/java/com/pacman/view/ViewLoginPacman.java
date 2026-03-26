@@ -27,7 +27,7 @@ public class ViewLoginPacman extends JPanel {
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         add(labelTitle, gbc);
 
-        JLabel labelUser = new JLabel("Username:");
+        JLabel labelUser = new JLabel("Email:");
         labelUser.setForeground(Color.WHITE);
         gbc.gridy = 1; gbc.gridwidth = 1;
         add(labelUser, gbc);

@@ -1,6 +1,7 @@
 package com.pacman.network;
 
 import java.net.ServerSocket;
+
 import java.net.Socket;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,9 +17,15 @@ import com.pacman.model.commands.Command;
 import com.pacman.view.ViewCommand;
 import com.pacman.model.commands.ChangeDirectionCommand;
 
+
+
 public class ServerMain {
-	private static final int PORT = 12345; // Assure-toi que le ClientMain utilise le même !
-    private static List<ClientHandler> clients = new ArrayList<>();
+	
+	private static int MAX_NUMBER_OF_PLAYERS = 4; // arbitraire
+	
+	private static final ClientHandler[] clients = new ClientHandler[MAX_NUMBER_OF_PLAYERS];
+	
+	private static final int PORT = 12345; // ajouter le choix du port au lacnement
     static PacmanGame game;
     static AbstractController gameController;
 
@@ -26,11 +33,9 @@ public class ServerMain {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("SERVEUR PACMAN : Prêt sur le port " + PORT);
 
-            // 1. Initialisation du moteur de jeu réel
             game = new PacmanGame(100, "src/main/webapp/layouts/bigSearch_twoPacmans_oneGhost.lay");
             game.initializeGame();
 
-            // 2. Initialisation du contrôleur pour la ViewCommand
             gameController = new ControllerPacmanGame(game);
             
             // 3. AFFICHAGE : Uniquement la télécommande admin
@@ -42,16 +47,30 @@ public class ServerMain {
             // 4. Lancement de la boucle de jeu
             new Thread(new GameLoop()).start();
 
-            // 5. Attente des clients
             while (true) {
-                Socket clientSocket = serverSocket.accept(); 
-                ClientHandler handler = new ClientHandler(clientSocket, clients.size());
+                Socket clientSocket = serverSocket.accept();
+                
                 synchronized (clients) {
-                    clients.add(handler);
+                    int slot = -1;
+                    // On cherche le premier emplacement vide
+                    for (int i = 0; i < clients.length; i++) {
+                        if (clients[i] == null) {
+                            slot = i;
+                            break;
+                        }
+                    }
+
+                    if (slot != -1) {
+                        ClientHandler handler = new ClientHandler(clientSocket, slot);
+                        clients[slot] = handler;
+                        new Thread(handler).start();
+                        System.out.println("Joueur connecté au slot : " + slot);
+                    } else {
+                        System.out.println("Serveur plein, connexion refusée.");
+                        clientSocket.close();
+                    }
                 }
-                new Thread(handler).start();
-                System.out.println("Joueur " + clients.size() + " connecté.");
-            }
+            }            
         } catch (IOException e) {
             System.err.println("Erreur Serveur : " + e.getMessage());
         }
@@ -60,7 +79,16 @@ public class ServerMain {
     public static void broadcastState(GameState state) {
         synchronized (clients) {
             for (ClientHandler c : clients) {
-                c.sendState(state);
+                if (c != null) c.sendState(state);
+            }
+        }
+    }
+    
+    public static void removeClient(int clientId) {
+        synchronized (clients) {
+            if (clientId >= 0 && clientId < clients.length) {
+                clients[clientId] = null;
+                System.out.println("Slot " + clientId + " libéré.");
             }
         }
     }

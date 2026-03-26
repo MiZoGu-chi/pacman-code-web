@@ -77,12 +77,7 @@ public class PacmanGame extends Game {
             Pacman pacman = (Pacman) factory.createAgent(p);
             pacmans.add(pacman);
 
-            // on considére arbitrairement que le premier pacman est toujours le pacman controllé par l'utilisateur
-            if(i == 0) {
-                pacman.setStrategy(new KeyboardStrategy());
-            } else {
-                pacman.setStrategy(new EatNearestFoodStrategy());
-            }
+            pacman.setStrategy(new KeyboardStrategy());
 
             System.out.println("Pacman created at position: " + p);
             
@@ -297,25 +292,44 @@ public class PacmanGame extends Game {
         return true;
     }
     
-    /**
-     * synchronise le jeu locale avec les donneés reçues par le serveur
-     * pour le moment on recharge l'entièreté du jeu à chaque fois
-     */
     public void updateFromState(GameState state) {
-    	
-    	pacmans.clear();
-    	ghosts.clear();
-    	
-    	for(PositionAgent p : state.getPacmanPositions()) {
-    		pacmans.add(new Pacman(p));
-    	}
-    	
-    	for(PositionAgent g : state.getGhostPositions()) {
-    		ghosts.add(new Ghost(g));
-    	}   
-    	
-        score = state.getScore();
-        life = state.getLives();
+        pacmans.clear();
+        ghosts.clear();
+        
+        for(PositionAgent p : state.getPacmanPositions()) pacmans.add(new Pacman(p));
+        for(PositionAgent g : state.getGhostPositions()) ghosts.add(new Ghost(g));   
+        
+        int oldScore = score;
+        int oldLife = life;
+        
+        this.score = state.getScore();
+        this.life = state.getLives();
+
+        support.firePropertyChange("ScoreChanged", null, this.score);
+        support.firePropertyChange("LifeChanged", null, this.life);
+        
+        // synchronisation du labyrinthe
+        boolean[][] foods = state.getFoods();
+        boolean[][] capsules = state.getCapsules();
+        if (foods != null && capsules != null) {
+            for (int x = 0; x < maze.getSizeX(); x++) {
+                for (int y = 0; y < maze.getSizeY(); y++) {
+                    maze.setFood(x, y, foods[x][y]);
+                    maze.setCapsule(x, y, capsules[x][y]);
+                }
+            }
+        }
+
+        if (oldScore != this.score) support.firePropertyChange("ScoreChanged", oldScore, this.score);
+        if (oldLife != this.life) support.firePropertyChange("LifeChanged", oldLife, this.life);
+        
+        if (state.isGameOver()) {
+            if (state.isVictory()) {
+                support.firePropertyChange("Victory", null, null);
+            } else {
+                support.firePropertyChange("GameOver", null, null);
+            }
+        }
     }
     
     public boolean isVictory() {

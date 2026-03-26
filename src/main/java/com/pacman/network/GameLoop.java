@@ -17,7 +17,6 @@ public class GameLoop implements Runnable {
             while (true) {
                 if (ServerMain.game.isRunning()) { 
                     
-                    // 1. EXÉCUTION DES COMMANDES : On vide la liste des actions reçues
                     synchronized (actions) {
                         for (Runnable r : actions) {
                             r.run();
@@ -25,30 +24,49 @@ public class GameLoop implements Runnable {
                         actions.clear();
                     }
 
-                    // 2. Avancement du jeu
                     ServerMain.game.takeTurn();
 
-                    // 3. PRÉPARATION DE L'ENVELOPPE : On remplit le GameState
                     GameState state = new GameState();
                     state.setPacmanPositions(ServerMain.game.getPacmansPosition());
                     state.setGhostPositions(ServerMain.game.getGhostsPosition());
                     state.setScore(ServerMain.game.getScore());
                     state.setLives(ServerMain.game.getLife());
-                    state.setGameOver(ServerMain.game.isGameOver()); //
+                    state.setGameOver(ServerMain.game.isGameOver());
                     state.setVictory(ServerMain.game.isVictory());
 
-                    // 4. DIFFUSION : On envoie à tous les clients
+                    int sizeX = ServerMain.game.getMaze().getSizeX();
+                    int sizeY = ServerMain.game.getMaze().getSizeY();
+                    boolean[][] currentFood = new boolean[sizeX][sizeY];
+                    boolean[][] currentCapsules = new boolean[sizeX][sizeY];
+
+                    for (int x = 0; x < sizeX; x++) {
+                        for (int y = 0; y < sizeY; y++) {
+                            currentFood[x][y] = ServerMain.game.getMaze().isFood(x, y);
+                            currentCapsules[x][y] = ServerMain.game.getMaze().isCapsule(x, y);
+                        }
+                    }
+
+                    state.setFoods(currentFood);
+                    state.setCapsules(currentCapsules);
+                    // --------------------------------------------------
+
                     ServerMain.broadcastState(state);
                 }
 
-                // Vitesse de la boucle (modifiable via le slider de ViewCommand)
                 Thread.sleep(200); 
 
                 if (ServerMain.game.isGameOver()) {
-                    System.out.println("Fin de partie sur le serveur.");
-                    break;
+                    GameState finalState = new GameState();
+                    finalState.setGameOver(true);
+                    finalState.setVictory(ServerMain.game.isVictory());
+                    finalState.setScore(ServerMain.game.getScore());
+
+                    ServerMain.broadcastState(finalState); 
+                    break; 
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { 
+            e.printStackTrace(); 
+        }
     }
 }
